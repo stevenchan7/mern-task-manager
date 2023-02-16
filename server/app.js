@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const { people } = require('./data');
+const { Task } = require('./models/task');
 
 // database
 mongoose
@@ -34,6 +35,11 @@ app.get('/', (req, res) => {
 
 app.get('/people', (req, res) => {
   res.status(200).json({ success: true, data: people });
+});
+
+app.post('/people', (req, res) => {
+  Task.create(req.body);
+  res.status(201).json({ success: true, data: req.body });
 });
 
 app.put('/people/:id', (req, res) => {
