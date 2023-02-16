@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const { people } = require('./data');
 
 // database
 mongoose
@@ -24,10 +25,27 @@ app.use(
     credentials: true,
   })
 );
+app.use(express.json());
 
 // routes
 app.get('/', (req, res) => {
   res.send('Hello Worlddddddd');
+});
+
+app.get('/people', (req, res) => {
+  res.status(200).json({ success: true, data: people });
+});
+
+app.put('/people/:id', (req, res) => {
+  const { newName } = req.body;
+  const { id } = req.params;
+  const newPeople = people.map((person) => {
+    if (person.id === Number(id)) {
+      person.name = newName;
+    }
+    return person;
+  });
+  res.status(201).json({ success: true, data: newPeople });
 });
 
 // port
