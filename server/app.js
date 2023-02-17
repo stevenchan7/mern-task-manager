@@ -33,22 +33,22 @@ app.get('/', (req, res) => {
   res.send('Hello Worlddddddd');
 });
 
-app.get('/people', (req, res) => {
+app.get('/api/tasks', async (req, res) => {
   async function find() {
     try {
-      const task = await Task.findById('63ee2363d9cb5df154709c3e', (err, result) => {
-        if (!err) {
+      await Task.find({}, (error, result) => {
+        if (!error) {
           return res.status(200).json({ success: true, data: result });
         }
       });
-      console.log(task);
     } catch (err) {
       console.log(err.message);
     }
   }
+  find();
 });
 
-app.post('/people', (req, res) => {
+app.post('/api/tasks', (req, res) => {
   const createTask = async () => {
     try {
       await Task.create(req.body);
@@ -61,7 +61,7 @@ app.post('/people', (req, res) => {
   res.status(201).json({ success: true, data: req.body });
 });
 
-app.put('/people/:id', (req, res) => {
+app.put('/api/tasks/:id', (req, res) => {
   const { newName } = req.body;
   const { id } = req.params;
   const newPeople = people.map((person) => {
