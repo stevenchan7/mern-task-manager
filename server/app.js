@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieSession = require('cookie-session');
 require('dotenv').config();
 const { people } = require('./data');
 const { Task } = require('./models/task');
@@ -27,10 +28,14 @@ app.use(
   })
 );
 app.use(express.json());
-<<<<<<< HEAD
 app.use(express.urlencoded({ extended: false }));
-=======
->>>>>>> 780a8d542e21007bd95f9fb5359e249dcd93e625
+app.use(
+  cookieSession({
+    name: 'steven-session',
+    secret: 'COOKIE_SECRET',
+    httpOnly: true,
+  })
+);
 
 // routes
 app.get('/', (req, res) => {
@@ -38,10 +43,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/tasks', async (req, res) => {
-<<<<<<< HEAD
   find();
-=======
->>>>>>> 780a8d542e21007bd95f9fb5359e249dcd93e625
   async function find() {
     try {
       await Task.find({}, (error, result) => {
@@ -53,34 +55,22 @@ app.get('/api/tasks', async (req, res) => {
       console.log(err.message);
     }
   }
-<<<<<<< HEAD
-=======
-  find();
->>>>>>> 780a8d542e21007bd95f9fb5359e249dcd93e625
 });
 
 app.post('/api/tasks', (req, res) => {
   const createTask = async () => {
     try {
-<<<<<<< HEAD
       await Task.create(req.body, (err) => {
         if (err) return handleError(err);
       });
-=======
-      await Task.create(req.body);
->>>>>>> 780a8d542e21007bd95f9fb5359e249dcd93e625
     } catch (err) {
       console.log(err.message);
     }
   };
   createTask();
 
-<<<<<<< HEAD
   // res.status(201).json({ success: true, data: req.body });
   res.redirect('http://localhost:3000/');
-=======
-  res.status(201).json({ success: true, data: req.body });
->>>>>>> 780a8d542e21007bd95f9fb5359e249dcd93e625
 });
 
 app.put('/api/tasks/:id', (req, res) => {
