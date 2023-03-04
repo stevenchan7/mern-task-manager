@@ -8,8 +8,11 @@ const verifyToken = (req, res, next) => {
   if (!token) return res.status(401).json({ message: 'Token not provided!' });
 
   jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) return res.status(401).json({ message: 'Unauthorized' });
+    if (err) return res.status(401).json({ message: 'Unauthorized', token: token });
 
     req.userId = decoded.id;
+    next();
   });
 };
+
+module.exports = verifyToken;
