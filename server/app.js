@@ -3,9 +3,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieSession = require('cookie-session');
-require('dotenv').config();
 const { people } = require('./data');
 const { Task } = require('./models/task');
+const verifyToken = require('./middlewares/authJwt');
+const checkDuplicateUsernameOrEmail = require('./middlewares/verifySignUp');
+const { signIn, signUp, signOut } = require('./controllers/auth.controller');
+require('dotenv').config();
 
 // database
 mongoose
@@ -20,15 +23,16 @@ mongoose
 // create app
 const app = express();
 
-// middleware
+// middlewares
 app.use(
   cors({
-    origin: true,
+    origin: ['http://localhost:3000', 'http://localhost:5000'],
     credentials: true,
   })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// Cookie session
 app.use(
   cookieSession({
     name: 'steven-session',
@@ -42,58 +46,82 @@ app.get('/', (req, res) => {
   res.send('Hello Worlddddddd');
 });
 
-app.get('/api/tasks', async (req, res) => {
+app.post('/api/auth/register', checkDuplicateUsernameOrEmail, signUp);
+
+app.post('/api/auth/login', signIn);
+
+app.post('/api/auth/logout', signOut);
+
+app.get('/api/tasks', verifyToken, async (req, res) => {
   find();
   async function find() {
     try {
-      await Task.find({}, (error, result) => {
-        if (!error) {
-          return res.status(200).json({ success: true, data: result });
-        }
-      });
+      const tasks = await Task.find({ userId: req.userId }).sort('-createdAt').limit(5);
+      return res
+        .status(200)
+        .json({ success: true, data: tasks, token: req.session.token, userId: req.userId });
     } catch (err) {
       console.log(err.message);
     }
   }
 });
 
-app.post('/api/tasks', (req, res) => {
-  const createTask = async () => {
+app.post('/api/tasks', verifyToken, async (req, res) => {
+  createTask();
+  async function createTask() {
     try {
-      await Task.create(req.body, (err) => {
-        if (err) return handleError(err);
+      const task = await Task.create({
+        taskName: req.body.taskName,
+        taskDue: req.body.taskDue,
+        date: req.body.date,
+        userId: req.userId,
       });
+      res.status(200).json({ success: true, data: task });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+});
+
+app.post('/api/tasks/delete', verifyToken, (req, res) => {
+  Task.deleteOne({ _id: req.body.taskId }, (err, result) => {
+    if (err) return res.status(400).json({ message: err });
+    // deleteOne return an object with deletedCount property
+    if (result.deletedCount > 0) return res.status(200).json({ data: result.deletedCount });
+  });
+});
+
+app.get('/api/availmonths', (req, res) => {
+  // Find all but select only createdAt field
+  Task.find({}, '-_id date', (err, data) => {
+    if (err) return res.status(400).json({ success: false, message: err });
+    if (!data) return res.status(400).json({ success: false, message: 'No task available' });
+    // Get only the year and the month from full date
+    const months = data.map((date) => {
+      return date.date.slice(0, 7);
+    });
+    // Remove duplicate
+    const uniquemonths = [...new Set(months)];
+
+    res.status(200).json({ success: true, data: uniquemonths });
+  });
+});
+
+app.get('/api/tasks/:month', verifyToken, async (req, res) => {
+  find();
+  async function find() {
+    try {
+      const tasks = await Task.find({
+        userId: req.userId,
+        date: { $regex: '.*' + req.params.month + '.*', $options: 'i' },
+      });
+      if (!tasks) return res.status(400).json({ success: false, message: 'No task this month' });
+      return res.status(200).json({ success: true, data: tasks });
     } catch (err) {
       console.log(err.message);
     }
-  };
-  createTask();
-
-  // res.status(201).json({ success: true, data: req.body });
-  res.redirect('http://localhost:3000/');
+  }
 });
-
-app.put('/api/tasks/:id', (req, res) => {
-  const { newName } = req.body;
-  const { id } = req.params;
-  const newPeople = people.map((person) => {
-    if (person.id === Number(id)) {
-      person.name = newName;
-    }
-    return person;
-  });
-  res.status(201).json({ success: true, data: newPeople });
-});
-
-// async function find() {
-//   try {
-//     const task = await Task.findById('63ee2363d9cb5df154709c3e');
-//     console.log(task);
-//   } catch (err) {
-//     console.log(err.message);
-//   }
-// }
-// find();
 
 // port
 const port = process.env.PORT || 5000;
