@@ -22,7 +22,7 @@ export default function HomePage() {
       const response = await axios.get('http://localhost:5000/api/tasks');
       setData(response.data.data); //response.data is not the actual data array, response.data.data is...
     } catch (err) {
-      console.log(err.message);
+      // console.log(err.message);
       Navigate('/login');
     }
   }

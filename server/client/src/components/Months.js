@@ -12,7 +12,7 @@ export default function MonthList() {
       console.log(res.data);
       setUniqueMonth(res.data.data);
     } catch (err) {
-      console.log(err.response.data.message);
+      // console.log(err.response.data.message);
       setErr(err.response.data.message);
     }
   }

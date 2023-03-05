@@ -12,10 +12,10 @@ export default function RegisterPage() {
   const Navigate = useNavigate();
 
   // Navigate to home page if logged changed
-  useEffect(() => { 
+  useEffect(() => {
     if (registered) Navigate('/login');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registered]); 
+  }, [registered]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,7 +32,7 @@ export default function RegisterPage() {
 
       if (res.data.message) setRegistered(true); // set logged to true to trigger useEffect
     } catch (err) {
-      console.log(err.response.data.message);
+      // console.log(err.response.data.message);
       setError(err.response.data.message);
     }
   };

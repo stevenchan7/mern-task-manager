@@ -14,7 +14,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (logged) Navigate('/');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logged]); 
+  }, [logged]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +33,7 @@ export default function LoginPage() {
       // }
       if (res.data.token) setLogged(true); // set logged to true to trigger useEffect
     } catch (err) {
-      console.log(err.response.data.message);
+      // console.log(err.response.data.message);
       setError(err.response.data.message);
     }
   };
