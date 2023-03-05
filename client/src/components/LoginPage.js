@@ -13,7 +13,8 @@ export default function LoginPage() {
   // Navigate to home page if logged changed
   useEffect(() => {
     if (logged) Navigate('/');
-  }, [logged]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logged]); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();

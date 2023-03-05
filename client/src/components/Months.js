@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 export default function MonthList() {
@@ -8,7 +8,7 @@ export default function MonthList() {
 
   async function getUniqueMonth() {
     try {
-      const res = await axios.get('/api/availmonths');
+      const res = await axios.get('/api/tasks/availmonths');
       console.log(res.data);
       setUniqueMonth(res.data.data);
     } catch (err) {

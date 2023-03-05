@@ -37,7 +37,7 @@ export default function TaskMonth() {
 
   useEffect(() => {
     getTaskMonth();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Container className='my-3'>

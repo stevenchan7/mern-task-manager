@@ -29,7 +29,7 @@ export default function HomePage() {
 
   useEffect(() => {
     getTask();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();

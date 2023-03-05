@@ -1,24 +1,15 @@
 // import modules
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieSession = require('cookie-session');
-const { people } = require('./data');
+const connectDB = require('./config/db');
 const { Task } = require('./models/task');
 const verifyToken = require('./middlewares/authJwt');
 const checkDuplicateUsernameOrEmail = require('./middlewares/verifySignUp');
 const { signIn, signUp, signOut } = require('./controllers/auth.controller');
 require('dotenv').config();
-
-// database
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('Connected to db...');
-  })
-  .catch((err) => {
-    console.log('Failed to connect', err);
-  });
 
 // create app
 const app = express();
@@ -42,10 +33,6 @@ app.use(
 );
 
 // routes
-app.get('/', (req, res) => {
-  res.send('Hello Worlddddddd');
-});
-
 app.post('/api/auth/register', checkDuplicateUsernameOrEmail, signUp);
 
 app.post('/api/auth/login', signIn);
@@ -73,6 +60,7 @@ app.post('/api/tasks', verifyToken, async (req, res) => {
       const task = await Task.create({
         taskName: req.body.taskName,
         taskDue: req.body.taskDue,
+        taskType: req.body.taskType,
         date: req.body.date,
         userId: req.userId,
       });
@@ -91,11 +79,12 @@ app.post('/api/tasks/delete', verifyToken, (req, res) => {
   });
 });
 
-app.get('/api/availmonths', (req, res) => {
+app.get('/api/tasks/availmonths', verifyToken, (req, res) => {
   // Find all but select only createdAt field
   Task.find({}, '-_id date', (err, data) => {
     if (err) return res.status(400).json({ success: false, message: err });
-    if (!data) return res.status(400).json({ success: false, message: 'No task available' });
+    if (data.length === 0)
+      return res.status(400).json({ success: false, message: 'No task available' });
     // Get only the year and the month from full date
     const months = data.map((date) => {
       return date.date.slice(0, 7);
@@ -115,17 +104,51 @@ app.get('/api/tasks/:month', verifyToken, async (req, res) => {
         userId: req.userId,
         date: { $regex: '.*' + req.params.month + '.*', $options: 'i' },
       });
-      if (!tasks) return res.status(400).json({ success: false, message: 'No task this month' });
-      return res.status(200).json({ success: true, data: tasks });
+      const tasksIn = await Task.find({
+        userId: req.userId,
+        date: { $regex: '.*' + req.params.month + '.*', $options: 'i' },
+        taskType: 'income',
+      });
+      const tasksEx = await Task.find({
+        userId: req.userId,
+        date: { $regex: '.*' + req.params.month + '.*', $options: 'i' },
+        taskType: 'expense',
+      });
+      if (!tasks) {
+        return res.status(400).json({ success: false, message: 'No task this month' });
+      }
+      res
+        .status(200)
+        .json({ success: true, data: { all: tasks, income: tasksIn, expense: tasksEx } });
     } catch (err) {
       console.log(err.message);
     }
   }
 });
 
+// PRODUCTION
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+
+  app.get('/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('API running');
+  });
+}
+
 // port
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+// database and listen
+connectDB()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server is running om port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });

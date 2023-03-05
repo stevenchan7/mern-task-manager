@@ -12,6 +12,11 @@ const taskSchema = new mongoose.Schema(
     }, // Date but for now let it be string
     date: {
       type: String,
+      required: true,
+    },
+    taskType: {
+      type: String,
+      required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
