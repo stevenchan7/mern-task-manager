@@ -19,7 +19,7 @@ export default function HomePage() {
   // getTask function
   async function getTask() {
     try {
-      const response = await axios.get('http://localhost:5000/api/tasks');
+      const response = await axios.get('/api/tasks');
       setData(response.data.data); //response.data is not the actual data array, response.data.data is...
     } catch (err) {
       // console.log(err.message);
@@ -34,7 +34,7 @@ export default function HomePage() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/tasks', {
+      const res = await axios.post('/api/tasks', {
         taskName: taskName,
         taskDue: taskDue,
         taskType: taskType,
@@ -50,7 +50,7 @@ export default function HomePage() {
   const handleButtonDelete = async (e, taskId) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/tasks/delete', {
+      const res = await axios.post('/api/tasks/delete', {
         taskId: taskId,
       });
 
