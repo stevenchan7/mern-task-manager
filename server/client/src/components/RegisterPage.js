@@ -41,7 +41,7 @@ export default function RegisterPage() {
     <Container fluid className='d-flex justify-content-center align-items-center'>
       <Container className='my-3'>
         <Form onSubmit={handleSubmit} className='mb-3'>
-          <Row style={{ width: '500px', margin: 'auto' }}>
+          <Row style={{ margin: 'auto' }}>
             <Col sm={12}>
               <Form.Group className='mb-3' controlId='formBasicText'>
                 <Form.Label>Username</Form.Label>
@@ -92,7 +92,7 @@ export default function RegisterPage() {
 
         <div className='text-center'>
           <p>{error}</p>
-          <Link to='/register'>Register Page</Link>
+          <Link to='/login'>Login Page</Link>
         </div>
       </Container>
     </Container>
