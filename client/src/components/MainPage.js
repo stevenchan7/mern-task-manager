@@ -11,6 +11,7 @@ export default function HomePage() {
   const [startDate, setStartDate] = useState(new Date());
   const [taskName, setTaskName] = useState('');
   const [taskDue, setTaskDue] = useState('');
+  const [taskType, setTaskType] = useState('');
   const [errDelete, setErrDelete] = useState('');
   const [errSubmit, setErrSubmit] = useState('');
   const Navigate = useNavigate();
@@ -36,6 +37,7 @@ export default function HomePage() {
       const res = await axios.post('http://localhost:5000/api/tasks', {
         taskName: taskName,
         taskDue: taskDue,
+        taskType: taskType,
         date: startDate,
       });
       // if post success, call getTask again to update the list
@@ -76,7 +78,7 @@ export default function HomePage() {
           </Button>
         </nav>
         <Form onSubmit={handleFormSubmit} className='my-3'>
-          <Row style={{ width: '500px', margin: 'auto' }}>
+          <Row style={{ margin: 'auto' }}>
             <Col sm={12}>
               <Form.Group className='mb-3'>
                 <Form.Label>
@@ -106,6 +108,15 @@ export default function HomePage() {
               </Form.Group>
             </Col>
             <Col sm={12}>
+              <Form.Group className='mb-3'>
+                <Form.Select onChange={(e) => setTaskType(e.target.value)}>
+                  <option>Task Type</option>
+                  <option value='income'>Income</option>
+                  <option value='expense'>Expense</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col sm={12}>
               <DatePicker
                 className='mb-3'
                 showIcon
@@ -122,7 +133,8 @@ export default function HomePage() {
         </Form>
 
         <Row>
-          <Col>
+          <Col className='my-3'>
+            <h3>Recent Submit</h3>
             {getData &&
               getData.map((task) => {
                 return (
@@ -132,6 +144,9 @@ export default function HomePage() {
                     </Col>
                     <Col>
                       <p>{task.taskDue}</p>
+                    </Col>
+                    <Col>
+                      <p>{task.taskType}</p>
                     </Col>
                     <Col>
                       <p>{task.date.slice(0, 10)}</p>

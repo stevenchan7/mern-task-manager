@@ -10,10 +10,10 @@ export default function MonthList() {
     try {
       const res = await axios.get('/api/availmonths');
       console.log(res.data);
-      if (res.data.message) setErr(res.data.message);
       setUniqueMonth(res.data.data);
     } catch (err) {
       console.log(err.response.data.message);
+      setErr(err.response.data.message);
     }
   }
 
@@ -22,7 +22,7 @@ export default function MonthList() {
   }, []);
 
   return (
-    <div>
+    <div className='m-3'>
       <ul>
         {uniqueMonth &&
           uniqueMonth.map((month) => {
@@ -33,7 +33,7 @@ export default function MonthList() {
             );
           })}
       </ul>
-      <p>{err}</p>
+      <h1>{err}</h1>
     </div>
   );
 }

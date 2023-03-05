@@ -7,12 +7,14 @@ axios.defaults.withCredentials = true;
 
 export default function TaskMonth() {
   const { month } = useParams();
-  const [taskMonth, setTaskMonth] = useState([]);
+  const [taskMonthIn, setTaskMonthIn] = useState([]);
+  const [taskMonthEx, setTaskMonthEx] = useState([]);
 
   async function getTaskMonth() {
     try {
-      const res = await axios.get(`/api/tasks/${month}`);
-      setTaskMonth(res.data.data);
+      const { data } = await axios.get(`/api/tasks/${month}`);
+      setTaskMonthIn(data.data.income);
+      setTaskMonthEx(data.data.expense);
     } catch (err) {
       console.log(err);
     }
@@ -38,28 +40,55 @@ export default function TaskMonth() {
   }, []);
 
   return (
-    <Container>
-      {taskMonth &&
-        taskMonth.map((task) => {
-          return (
-            <Row key={task._id}>
-              <Col>
-                <p>{task.taskName}</p>
-              </Col>
-              <Col>
-                <p>{task.taskDue}</p>
-              </Col>
-              <Col>
-                <p>{task.date.slice(0, 10)}</p>
-              </Col>
-              <Col>
-                <button type='button' onClick={(e) => handleButtonDelete(e, task._id)}>
-                  Delete
-                </button>
-              </Col>
-            </Row>
-          );
-        })}
+    <Container className='my-3'>
+      <Row>
+        <Col>
+          <h1>Income</h1>
+          {taskMonthIn &&
+            taskMonthIn.map((task) => {
+              return (
+                <Row key={task._id}>
+                  <Col>
+                    <p>{task.taskName}</p>
+                  </Col>
+                  <Col>
+                    <p>{task.taskDue}</p>
+                  </Col>
+                  <Col>
+                    <p>{task.date.slice(0, 10)}</p>
+                  </Col>
+                  <Col>
+                    <button type='button' onClick={(e) => handleButtonDelete(e, task._id)}>
+                      Delete
+                    </button>
+                  </Col>
+                </Row>
+              );
+            })}
+          <h1>Expense</h1>
+          {taskMonthEx &&
+            taskMonthEx.map((task) => {
+              return (
+                <Row key={task._id}>
+                  <Col>
+                    <p>{task.taskName}</p>
+                  </Col>
+                  <Col>
+                    <p>{task.taskDue}</p>
+                  </Col>
+                  <Col>
+                    <p>{task.date.slice(0, 10)}</p>
+                  </Col>
+                  <Col>
+                    <button type='button' onClick={(e) => handleButtonDelete(e, task._id)}>
+                      Delete
+                    </button>
+                  </Col>
+                </Row>
+              );
+            })}
+        </Col>
+      </Row>
     </Container>
   );
 }
