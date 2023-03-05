@@ -25,7 +25,7 @@ export default function TaskMonth() {
     e.preventDefault();
 
     try {
-      const res = await axios.post('/api/tasks/delete', {
+      const res = await axios.post('http://localhost:5000/api/tasks/delete', {
         taskId: taskId,
       });
       // If delete success call getTaskMonth again so data will get updated
