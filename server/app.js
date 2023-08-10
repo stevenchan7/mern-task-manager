@@ -81,7 +81,7 @@ app.post('/api/tasks/delete', verifyToken, (req, res) => {
 
 app.get('/api/tasks/availmonths', verifyToken, (req, res) => {
   // Find all but select only createdAt field
-  Task.find({}, '-_id date', (err, data) => {
+  Task.find({ userId: req.userId }, '-_id date', (err, data) => {
     if (err) return res.status(400).json({ success: false, message: err });
     if (data.length === 0)
       return res.status(400).json({ success: false, message: 'No task available' });
